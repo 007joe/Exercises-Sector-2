@@ -1,10 +1,10 @@
 package com.techelevator.auctions.services;
 
-import java.util.Scanner;
-
 import com.techelevator.auctions.model.Auction;
 
-public class  ConsoleService {
+import java.util.Scanner;
+
+public class ConsoleService {
 
     private final Scanner scanner = new Scanner(System.in);
 
@@ -26,6 +26,9 @@ public class  ConsoleService {
         System.out.println("2: List details for specific auction");
         System.out.println("3: Find auctions with a specific term in the title");
         System.out.println("4: Find auctions below a specified price");
+        System.out.println("5: Create a new auction");
+        System.out.println("6: Modify an auction");
+        System.out.println("7: Delete an auction");
         System.out.println("0: Exit");
         System.out.println();
     }
@@ -80,6 +83,61 @@ public class  ConsoleService {
             System.out.println("User: " + auction.getUser());
             System.out.println("Current Bid: " + auction.getCurrentBid());
         }
+    }
+
+    public Auction promptForAuctionData() {
+        return promptForAuctionData(null);
+    }
+
+    public Auction promptForAuctionData(Auction existingAuction) {
+        Auction newAuction = null;
+        while (newAuction == null) {
+            System.out.println("--------------------------------------------");
+            System.out.println("Enter auction data as a comma separated list containing:");
+            System.out.println("title, description, user, current bid price (without dollar sign)");
+            if (existingAuction != null) {
+                System.out.println("Auction " + existingAuction.getId() + " Data: " + existingAuction.getTitle() +
+                        ", " + existingAuction.getDescription() + ", " + existingAuction.getUser() + ", " +
+                        existingAuction.getCurrentBid());
+            } else {
+                System.out.println("Example: Mad-dog Sneakers, Soles check. Laces check., Cierra_Pagac, 125.23");
+            }
+            System.out.println("--------------------------------------------");
+            newAuction = makeAuction(scanner.nextLine());
+            if (newAuction == null) {
+                System.out.println("Invalid entry. Please try again.");
+            }
+        }
+        if (existingAuction != null) {
+            newAuction.setId(existingAuction.getId());
+        }
+        return newAuction;
+    }
+
+    private Auction makeAuction(String csv) {
+        Auction auction = null;
+        String[] parsed = csv.split(",");
+        if (parsed.length == 4) {
+            try {
+                auction = new Auction();
+                auction.setTitle(parsed[0].trim());
+                auction.setDescription(parsed[1].trim());
+                auction.setUser(parsed[2].trim());
+                auction.setCurrentBid(Double.parseDouble(parsed[3].trim()));
+            } catch (NumberFormatException e) {
+                auction = null;
+            }
+        }
+        return auction;
+    }
+
+    public void pause() {
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    public void printErrorMessage() {
+        System.out.println("An error occurred. Check the log for details.");
     }
 
 }
